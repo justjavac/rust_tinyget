@@ -1,0 +1,40 @@
+[package]
+name = "tinyget"
+version = "1.0.0"
+authors = ["迷渡 <justjavac@gmail.com>"]
+description = "Tiny HTTP(S) GET"
+documentation = "https://docs.rs/tinyget"
+homepage = "https://github.com/justjavac/rust_tinyget"
+repository = "https://github.com/justjavac/rust_tinyget"
+readme = "README.md"
+keywords = ["http", "https", "client", "request", "get", "fetch"]
+categories = ["web-programming::http-client"]
+license = "MIT"
+edition = "2018"
+
+[dependencies]
+# For the https features:
+native-tls = { version = "0.2", optional = true }
+
+[dev-dependencies]
+tiny_http = "0.7"
+
+[package.metadata.docs.rs]
+features = ["https"]
+
+[features]
+https = ["native-tls"]
+
+[[example]]
+name = "http"
+
+[[example]]
+name = "iterator"
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = 'z' # Optimize for size
+panic = "abort"
+
+# vim: ft=conf
