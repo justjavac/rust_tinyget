@@ -41,7 +41,6 @@ rustc 1.49.0 (e1884a8e3 2020-12-29)
 [2]: ./examples/http.rs
 [3]: ./examples/https.rs
 
-
 ## License
 
 This crate is distributed under the terms of the [MIT license](./LICENSE).
