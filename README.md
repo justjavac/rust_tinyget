@@ -41,6 +41,15 @@ rustc 1.49.0 (e1884a8e3 2020-12-29)
 [2]: ./examples/http.rs
 [3]: ./examples/https.rs
 
+## Compare
+
+|                  | http       | https     |
+|------------------|-----------:|----------:|
+| **tinyget**      |    283,920 |   319,632 |
+| **minreq**       |    300,328 |   959,744 |
+| **ureq**         |    695,632 | 1,371,368 |
+| **reqwest**      |  1,639,496 | 1,675,032 |
+
 ## License
 
 This crate is distributed under the terms of the [MIT license](./LICENSE).
