@@ -165,18 +165,12 @@ impl Request {
         // redirections. See RFC 7231 section 7.1.2.
         let inherit_fragment = |resource: String, original_resource: &str| {
             if resource.chars().any(|c| c == '#') {
-                println!("Resource has a resource, not inheriting.");
                 resource
             } else {
                 let mut original_resource_split = original_resource.split('#');
                 if let Some(fragment) = original_resource_split.nth(1) {
-                    println!("Using inherited fragment.");
                     format!("{}#{}", resource, fragment)
                 } else {
-                    println!(
-                        "Neither has a resource, not inheriting. Original: {}",
-                        original_resource
-                    );
                     resource
                 }
             }
