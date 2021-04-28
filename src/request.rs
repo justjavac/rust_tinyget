@@ -3,6 +3,7 @@ use crate::{Error, Response, ResponseLazy};
 use std::collections::HashMap;
 
 /// A URL type for requests.
+#[allow(clippy::upper_case_acronyms)]
 pub type URL = String;
 
 /// An HTTP request.
