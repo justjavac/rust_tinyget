@@ -1,7 +1,6 @@
 # tinyget
 
-[![Build Status](https://github.com/justjavac/rust_tinyget/workflows/ci/badge.svg?branch=master)](https://github.com/justjavac/rust_tinyget/actions)
-[![Latest version](https://img.shields.io/crates/v/tinyget.svg)](https://crates.io/crates/tinyget)
+[![ci](https://github.com/justjavac/rust_tinyget/actions/workflows/ci.yml/badge.svg)](https://github.com/justjavac/rust_tinyget/actions/workflows/ci.yml)
 [![Crate](https://img.shields.io/crates/v/tinyget.svg)](https://crates.io/crates/tinyget)
 [![Documentation](https://docs.rs/tinyget/badge.svg)](https://docs.rs/tinyget)
 ![License](https://img.shields.io/crates/l/tinyget.svg)
