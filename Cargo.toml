@@ -1,6 +1,6 @@
 [package]
 name = "tinyget"
-version = "1.0.0"
+version = "1.0.1"
 authors = ["迷渡 <justjavac@gmail.com>"]
 description = "Tiny HTTP(S) GET"
 documentation = "https://docs.rs/tinyget"
@@ -17,7 +17,7 @@ edition = "2018"
 native-tls = { version = "0.2", optional = true }
 
 [dev-dependencies]
-tiny_http = "0.7"
+tiny_http = "0.9"
 
 [package.metadata.docs.rs]
 features = ["https"]
