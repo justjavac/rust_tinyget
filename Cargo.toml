@@ -10,7 +10,7 @@ readme = "README.md"
 keywords = ["http", "https", "client", "request", "get"]
 categories = ["web-programming::http-client"]
 license = "MIT"
-edition = "2018"
+edition = "2021"
 
 [dependencies]
 # For the https features:

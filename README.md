@@ -7,7 +7,8 @@
 
 > a tiny fork of [minreq](https://crates.io/crates/minreq).
 
-Simple, minimal-dependency HTTP client. Optional features for https with `native-tls` TLS implementations.
+Simple, minimal-dependency HTTP client. Optional features for https with
+`native-tls` TLS implementations.
 
 [Documentation](https://docs.rs/tinyget)
 
@@ -28,13 +29,13 @@ println!("{}", hello);
 
 ## Size
 
-rustc 1.49.0 (e1884a8e3 2020-12-29) 
+rustc 1.76.0 (07dca489a 2024-02-04)
 
-|                  | debug          | release       |
-|------------------|----------------|---------------|
-| [**hello**][1]   | 262,864        | 233,752       |
-| [**http**][2]    | 498,040(+235k) | 283,920(+50k) |
-| [**https**][3]   | 702,696(+440k) | 319,632(+87k) |
+|                | debug              | release        |
+| -------------- | ------------------ | -------------- |
+| [**hello**][1] |   424,896          | 266,547        |
+| [**http**][2]  |   772,416(+348k)   | 319,856(+53k)  |
+| [**https**][3] | 1,101,512(+677k)   | 344,432(+78k)  |
 
 [1]: ./examples/hello.rs
 [2]: ./examples/http.rs
@@ -42,12 +43,12 @@ rustc 1.49.0 (e1884a8e3 2020-12-29)
 
 ## Compare
 
-|                  | http       | https     |
-|------------------|-----------:|----------:|
-| **tinyget**      |    283,920 |   319,632 |
-| **minreq**       |    300,328 |   959,744 |
-| **ureq**         |    695,632 | 1,371,368 |
-| **reqwest**      |  1,639,496 | 1,675,032 |
+|             |      http |     https |
+| ----------- | --------: | --------: |
+| **tinyget** |   283,920 |   319,632 |
+| **minreq**  |   300,328 |   959,744 |
+| **ureq**    |   695,632 | 1,371,368 |
+| **reqwest** | 1,639,496 | 1,675,032 |
 
 ## License
 
