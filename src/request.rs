@@ -1,7 +1,6 @@
 use crate::connection::Connection;
 use crate::{Error, Response, ResponseLazy};
 use std::collections::HashMap;
-use urlencoding;
 
 /// A URL type for requests.
 #[allow(clippy::upper_case_acronyms)]
