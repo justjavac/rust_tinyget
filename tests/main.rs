@@ -31,6 +31,7 @@ fn test_https() {
 }
 
 #[test]
+#[cfg(feature = "timeout")]
 fn test_timeout_too_low() {
     setup();
     let result = tinyget::get(url("/slow_a")).with_timeout(1).send();
@@ -38,6 +39,7 @@ fn test_timeout_too_low() {
 }
 
 #[test]
+#[cfg(feature = "timeout")]
 fn test_timeout_high_enough() {
     setup();
     let body = get_body(tinyget::get(url("/slow_a")).with_timeout(3).send());
