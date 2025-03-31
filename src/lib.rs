@@ -79,6 +79,23 @@
 //! # Ok(()) }
 //! ```
 //!
+//! ## Query Parameters
+//!
+//! To add query parameters to your request, use `with_query("key", "value")` before
+//! `send()`.
+//!
+//! ```
+//! # fn main() -> Result<(), Box<dyn std::error::Error>> {
+//! let response = tinyget::get("http://httpbin.org/get")
+//!     .with_query("name", "John")
+//!     .with_query("age", "30")
+//!     .send()?;
+//! let body_str = response.as_str()?;
+//! assert!(body_str.contains("\"name\": \"John\""));
+//! assert!(body_str.contains("\"age\": \"30\""));
+//! # Ok(()) }
+//! ```
+//!
 //! ## Timeouts
 //! To avoid timing out, or limit the request's response time, use
 //! `with_timeout(n)` before `send()`. The given value is in seconds.
