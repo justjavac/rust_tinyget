@@ -78,7 +78,7 @@
 //! assert_eq!(response.headers.get("content-type").unwrap(), "application/json");
 //! # Ok(()) }
 //! ```
-//! 
+//!
 //! ## Query Parameters
 //!
 //! To add query parameters to your request, use `with_query("key", "value")` before
@@ -95,7 +95,7 @@
 //! assert!(body_str.contains("\"age\": \"30\""));
 //! # Ok(()) }
 //! ```
-//! 
+//!
 //! ## Timeouts
 //! To avoid timing out, or limit the request's response time, use
 //! `with_timeout(n)` before `send()`. The given value is in seconds.
