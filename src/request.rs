@@ -26,6 +26,7 @@ pub struct Request {
     pub(crate) host: URL,
     resource: URL,
     headers: HashMap<String, String>,
+    #[cfg(feature = "timeout")]
     pub(crate) timeout: Option<u64>,
     max_redirects: usize,
     https: bool,
@@ -43,6 +44,7 @@ impl Request {
             host,
             resource,
             headers: HashMap::new(),
+            #[cfg(feature = "timeout")]
             timeout: None,
             max_redirects: 100,
             https,
@@ -58,6 +60,7 @@ impl Request {
     }
 
     /// Sets the request timeout in seconds.
+    #[cfg(feature = "timeout")]
     pub fn with_timeout(mut self, timeout: u64) -> Request {
         self.timeout = Some(timeout);
         self
@@ -87,11 +90,37 @@ impl Request {
     #[cfg(feature = "https")]
     pub fn send(self) -> Result<Response, Error> {
         if self.https {
-            let response = Connection::new(self).send_https()?;
-            Response::create(response)
+            #[cfg(feature = "timeout")]
+            {
+                let response = match self.timeout {
+                    Some(timeout) => Connection::new(self)
+                        .send_https_timeout(std::time::Duration::from_secs(timeout))?,
+                    None => Connection::new(self).send_https()?,
+                };
+                Response::create(response)
+            }
+
+            #[cfg(not(feature = "timeout"))]
+            {
+                let response = Connection::new(self).send_https()?;
+                Response::create(response)
+            }
         } else {
-            let response = Connection::new(self).send()?;
-            Response::create(response)
+            #[cfg(feature = "timeout")]
+            {
+                let response = match self.timeout {
+                    Some(timeout) => Connection::new(self)
+                        .send_timeout(std::time::Duration::from_secs(timeout))?,
+                    None => Connection::new(self).send()?,
+                };
+                Response::create(response)
+            }
+
+            #[cfg(not(feature = "timeout"))]
+            {
+                let response = Connection::new(self).send()?;
+                Response::create(response)
+            }
         }
     }
 
@@ -123,8 +152,21 @@ impl Request {
         if self.https {
             Err(Error::HttpsFeatureNotEnabled)
         } else {
-            let response = Connection::new(self).send()?;
-            Response::create(response)
+            #[cfg(feature = "timeout")]
+            {
+                let response = match self.timeout {
+                    Some(timeout) => Connection::new(self)
+                        .send_timeout(std::time::Duration::from_secs(timeout))?,
+                    None => Connection::new(self).send()?,
+                };
+                Response::create(response)
+            }
+
+            #[cfg(not(feature = "timeout"))]
+            {
+                let response = Connection::new(self).send()?;
+                Response::create(response)
+            }
         }
     }
 

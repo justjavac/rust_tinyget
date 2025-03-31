@@ -19,14 +19,30 @@ native-tls = { version = "0.2", optional = true }
 [dev-dependencies]
 tiny_http = "0.9"
 
+[lib]
+doctest = false
+
 [package.metadata.docs.rs]
-features = ["https"]
+features = ["https", "timeout"]
 
 [features]
 https = ["native-tls"]
+timeout = []
 
 [[example]]
 name = "http"
+
+[[example]]
+name = "http_timeout"
+required-features = ["timeout"]
+
+[[example]]
+name = "https"
+required-features = ["https"]
+
+[[example]]
+name = "https_timeout"
+required-features = ["https", "timeout"]
 
 [[example]]
 name = "iterator"
