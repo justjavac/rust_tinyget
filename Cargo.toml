@@ -1,6 +1,6 @@
 [package]
 name = "tinyget"
-version = "1.0.2"
+version = "1.1.0"
 authors = ["迷渡 <justjavac@gmail.com>"]
 description = "Tiny HTTP(S) GET"
 documentation = "https://docs.rs/tinyget"
