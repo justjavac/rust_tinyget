@@ -1,6 +1,7 @@
 use crate::connection::Connection;
 use crate::{Error, Response, ResponseLazy};
 use std::collections::HashMap;
+use urlencoding;
 
 /// A URL type for requests.
 #[allow(clippy::upper_case_acronyms)]
@@ -26,6 +27,7 @@ pub struct Request {
     pub(crate) host: URL,
     resource: URL,
     headers: HashMap<String, String>,
+    query: HashMap<String, String>,
     #[cfg(feature = "timeout")]
     pub(crate) timeout: Option<u64>,
     max_redirects: usize,
@@ -44,6 +46,7 @@ impl Request {
             host,
             resource,
             headers: HashMap::new(),
+            query: HashMap::new(),
             #[cfg(feature = "timeout")]
             timeout: None,
             max_redirects: 100,
@@ -56,6 +59,12 @@ impl Request {
     /// function to add headers to your requests.
     pub fn with_header<T: Into<String>, U: Into<String>>(mut self, key: T, value: U) -> Request {
         self.headers.insert(key.into(), value.into());
+        self
+    }
+
+    /// Adds a query parameter to the URL.
+    pub fn with_query<T: Into<String>, U: Into<String>>(mut self, key: T, value: U) -> Request {
+        self.query.insert(key.into(), value.into());
         self
     }
 
@@ -189,7 +198,25 @@ impl Request {
     pub(crate) fn as_bytes(&self) -> Vec<u8> {
         let mut http = String::with_capacity(32);
         // Add the request line and the "Host" header
-        http += &format!("GET {} HTTP/1.1\r\nHost: {}\r\n", self.resource, self.host);
+        let resource = if self.query.is_empty() {
+            self.resource.clone()
+        } else {
+            let mut query_string = String::new();
+            for (i, (k, v)) in self.query.iter().enumerate() {
+                // Check if original URL already contains query parameters
+                let separator = if i == 0 && !self.resource.contains('?') {
+                    '?'
+                } else {
+                    '&'
+                };
+                query_string.push(separator);
+                query_string.push_str(&urlencoding::encode(k));
+                query_string.push('=');
+                query_string.push_str(&urlencoding::encode(v));
+            }
+            format!("{}{}", self.resource, query_string)
+        };
+        http += &format!("GET {} HTTP/1.1\r\nHost: {}\r\n", resource, self.host);
         // Add other headers
         for (k, v) in &self.headers {
             http += &format!("{}: {}\r\n", k, v);

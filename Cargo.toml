@@ -15,6 +15,7 @@ edition = "2021"
 [dependencies]
 # For the https features:
 native-tls = { version = "0.2", optional = true }
+urlencoding = "2.1"
 
 [dev-dependencies]
 tiny_http = "0.9"
