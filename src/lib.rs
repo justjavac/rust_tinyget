@@ -12,7 +12,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! tinyget = { version = "1.0", features = ["https"] }
+//! tinyget = { version = "1.1", features = ["https", "timeout"] }
 //! ```
 //!
 //! Below is the list of all available features.
@@ -29,6 +29,29 @@
 //!
 //! [`Request`](struct.Request.html) and
 //! [`Response`](struct.Response.html) expose
+//!
+//! ## `timeout`
+//!
+//! This feature adds the ability to set a timeout for the request.
+//! By default, a request has no timeout.  You can change this in two ways:
+//! - Use [`with_timeout`](struct.Request.html#method.with_timeout) on
+//!   your request to set the timeout per-request like so:
+//!   ```
+//!   tinyget::get("/").with_timeout(8).send();
+//!   ```
+//! - Set the environment variable `TINYGET_TIMEOUT` to the desired
+//!   amount of seconds until timeout. Ie. if you have a program called
+//!   `foo` that uses tinyget, and you want all the requests made by that
+//!   program to timeout in 8 seconds, you launch the program like so:
+//!   ```text,ignore
+//!   $ TINYGET_TIMEOUT=8 ./foo
+//!   ```
+//!   Or add the following somewhere before the requests in the code.
+//!   ```
+//!   std::env::set_var("TINYGET_TIMEOUT", "8");
+//!   ```
+//! If the timeout is set with `with_timeout`, the environment
+//! variable will be ignored.
 //!
 //! # Examples
 //!
@@ -100,7 +123,7 @@
 //! To avoid timing out, or limit the request's response time, use
 //! `with_timeout(n)` before `send()`. The given value is in seconds.
 //!
-//! NOTE: There is no timeout by default.
+//! NOTE: To Use this feature, you need to enable the `timeout` feature.
 //! ```no_run
 //! # fn main() -> Result<(), Box<dyn std::error::Error>> {
 //! let response = tinyget::get("http://httpbin.org/delay/6")
@@ -109,27 +132,6 @@
 //! println!("{}", response.as_str()?);
 //! # Ok(()) }
 //! ```
-//!
-//! # Timeouts
-//! By default, a request has no timeout.  You can change this in two ways:
-//! - Use [`with_timeout`](struct.Request.html#method.with_timeout) on
-//!   your request to set the timeout per-request like so:
-//!   ```
-//!   tinyget::get("/").with_timeout(8).send();
-//!   ```
-//! - Set the environment variable `TINYGET_TIMEOUT` to the desired
-//!   amount of seconds until timeout. Ie. if you have a program called
-//!   `foo` that uses tinyget, and you want all the requests made by that
-//!   program to timeout in 8 seconds, you launch the program like so:
-//!   ```text,ignore
-//!   $ TINYGET_TIMEOUT=8 ./foo
-//!   ```
-//!   Or add the following somewhere before the requests in the code.
-//!   ```
-//!   std::env::set_var("TINYGET_TIMEOUT", "8");
-//!   ```
-//! If the timeout is set with `with_timeout`, the environment
-//! variable will be ignored.
 
 #![deny(missing_docs)]
 
