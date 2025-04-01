@@ -3,7 +3,6 @@ mod setup;
 
 use self::setup::*;
 
-// 使用本地服务器测试基本功能
 #[test]
 fn test_basic_functionality() -> Result<(), Box<dyn std::error::Error>> {
     setup();
@@ -15,11 +14,10 @@ fn test_basic_functionality() -> Result<(), Box<dyn std::error::Error>> {
     let status_code = get_status_code(Ok(response));
 
     assert_eq!(status_code, 200);
-    assert_eq!(body, "Test"); // 服务器返回 Ping header 的值
+    assert_eq!(body, "Test");
     Ok(())
 }
 
-// 使用 httpbin.org 测试查询参数
 #[test]
 fn test_basic_query() -> Result<(), Box<dyn std::error::Error>> {
     let response = tinyget::get("http://httpbin.org/get")
@@ -68,7 +66,7 @@ fn test_chinese_characters() -> Result<(), Box<dyn std::error::Error>> {
 
     let body = get_body(Ok(response));
 
-    assert!(body.contains("\"name\": \"\\u5f20\\u4e09\"")); // Unicode 转义序列
+    assert!(body.contains("\"name\": \"\\u5f20\\u4e09\""));
     Ok(())
 }
 

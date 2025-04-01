@@ -121,10 +121,6 @@ Check out the [examples](./examples) directory for more usage examples:
 - [HTTPS request with timeout](./examples/https_timeout.rs)
 - [Iterator example](./examples/iterator.rs)
 
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
 ## License
 
 This crate is distributed under the terms of the [MIT license](./LICENSE).
