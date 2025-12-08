@@ -1,7 +1,9 @@
 use crate::{connection::HttpStream, Error};
 use std::collections::HashMap;
-use std::io::{Bytes, Read};
+use std::io::{BufReader, Bytes, Read};
 use std::str;
+
+const BACKING_READ_BUFFER_LENGTH: usize = 16 * 1024;
 
 /// An HTTP response.
 ///
@@ -162,13 +164,15 @@ pub struct ResponseLazy {
     /// keys) are all lowercase.
     pub headers: HashMap<String, String>,
 
-    stream: Bytes<HttpStream>,
+    stream: HttpStreamBytes,
     state: HttpStreamState,
 }
 
+type HttpStreamBytes = Bytes<BufReader<HttpStream>>;
+
 impl ResponseLazy {
     pub(crate) fn from_stream(stream: HttpStream) -> Result<ResponseLazy, Error> {
-        let mut stream = stream.bytes();
+        let mut stream = BufReader::with_capacity(BACKING_READ_BUFFER_LENGTH, stream).bytes();
         let ResponseMetadata {
             status_code,
             reason_phrase,
@@ -207,7 +211,7 @@ impl Iterator for ResponseLazy {
     }
 }
 
-fn read_until_closed(bytes: &mut Bytes<HttpStream>) -> Option<<ResponseLazy as Iterator>::Item> {
+fn read_until_closed(bytes: &mut HttpStreamBytes) -> Option<<ResponseLazy as Iterator>::Item> {
     if let Some(byte) = bytes.next() {
         match byte {
             Ok(byte) => Some(Ok((byte, 1))),
@@ -219,7 +223,7 @@ fn read_until_closed(bytes: &mut Bytes<HttpStream>) -> Option<<ResponseLazy as I
 }
 
 fn read_with_content_length(
-    bytes: &mut Bytes<HttpStream>,
+    bytes: &mut HttpStreamBytes,
     content_length: &mut usize,
 ) -> Option<<ResponseLazy as Iterator>::Item> {
     if *content_length > 0 {
@@ -236,7 +240,7 @@ fn read_with_content_length(
 }
 
 fn read_trailers(
-    bytes: &mut Bytes<HttpStream>,
+    bytes: &mut HttpStreamBytes,
     headers: &mut HashMap<String, String>,
 ) -> Result<(), Error> {
     loop {
@@ -251,7 +255,7 @@ fn read_trailers(
 }
 
 fn read_chunked(
-    bytes: &mut Bytes<HttpStream>,
+    bytes: &mut HttpStreamBytes,
     headers: &mut HashMap<String, String>,
     expecting_more_chunks: &mut bool,
     chunk_length: &mut usize,
@@ -340,7 +344,7 @@ struct ResponseMetadata {
     state: HttpStreamState,
 }
 
-fn read_metadata(stream: &mut Bytes<HttpStream>) -> Result<ResponseMetadata, Error> {
+fn read_metadata(stream: &mut HttpStreamBytes) -> Result<ResponseMetadata, Error> {
     let (status_code, reason_phrase) = parse_status_line(&read_line(stream)?);
 
     let mut headers = HashMap::new();
@@ -390,7 +394,7 @@ fn read_metadata(stream: &mut Bytes<HttpStream>) -> Result<ResponseMetadata, Err
     })
 }
 
-fn read_line(stream: &mut Bytes<HttpStream>) -> Result<String, Error> {
+fn read_line(stream: &mut HttpStreamBytes) -> Result<String, Error> {
     let mut bytes = Vec::with_capacity(32);
     for byte in stream {
         let byte = byte?;
