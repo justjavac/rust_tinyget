@@ -428,6 +428,8 @@ fn parse_status_line(line: &str) -> (i32, String) {
     if let Ok(status_code) = status_code.parse::<i32>() {
         if !reason_phrase.is_empty() {
             return (status_code, reason_phrase);
+        } else {
+            return (status_code, "Server did not provide a reason".to_string())   
         }
     }
 
