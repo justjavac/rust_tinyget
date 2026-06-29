@@ -12,6 +12,7 @@ A simple, minimal-dependency HTTP client for Rust. It provides a clean and intui
 ## Features
 
 - Simple and intuitive API
+- GET and POST requests
 - Minimal dependencies
 - Optional HTTPS support via native-tls
 - Optional timeout support
@@ -85,6 +86,15 @@ TINYGET_TIMEOUT=5 cargo run
 ```rust
 let response = tinyget::get("https://httpbin.org/anything")
     .with_header("User-Agent", "tinyget/1.1")
+    .send()?;
+```
+
+### POST Requests
+
+```rust
+let response = tinyget::post("https://httpbin.org/anything")
+    .with_header("Content-Type", "text/plain")
+    .with_body("hello from tinyget")
     .send()?;
 ```
 

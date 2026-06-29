@@ -119,6 +119,21 @@
 //! # Ok(()) }
 //! ```
 //!
+//! ## POST Requests
+//!
+//! To send a POST request, use [`post`](fn.post.html). Request bodies
+//! can be set with [`with_body`](struct.Request.html#method.with_body).
+//!
+//! ```
+//! # fn main() -> Result<(), Box<dyn std::error::Error>> {
+//! let response = tinyget::post("http://httpbin.org/anything")
+//!     .with_header("Content-Type", "text/plain")
+//!     .with_body("hello from tinyget")
+//!     .send()?;
+//! assert_eq!(response.status_code, 200);
+//! # Ok(()) }
+//! ```
+//!
 //! ## Timeouts
 //! To avoid timing out, or limit the request's response time, use
 //! `with_timeout(n)` before `send()`. The given value is in seconds.
