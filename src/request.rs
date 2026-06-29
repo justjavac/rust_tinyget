@@ -33,6 +33,10 @@ pub struct Request {
     pub(crate) timeout: Option<u64>,
     max_redirects: usize,
     https: bool,
+    #[cfg(feature = "https")]
+    pub(crate) danger_accept_invalid_certs: bool,
+    #[cfg(feature = "https")]
+    pub(crate) danger_accept_invalid_hostnames: bool,
     pub(crate) redirects: Vec<(bool, URL, URL)>,
 }
 
@@ -54,6 +58,10 @@ impl Request {
             timeout: None,
             max_redirects: 100,
             https,
+            #[cfg(feature = "https")]
+            danger_accept_invalid_certs: false,
+            #[cfg(feature = "https")]
+            danger_accept_invalid_hostnames: false,
             redirects: Vec::new(),
         }
     }
@@ -99,6 +107,26 @@ impl Request {
     /// becomes a problem, please open an issue.
     pub fn with_max_redirects(mut self, max_redirects: usize) -> Request {
         self.max_redirects = max_redirects;
+        self
+    }
+
+    /// Controls whether invalid TLS certificates are accepted.
+    ///
+    /// This disables certificate chain validation and should only be
+    /// used for testing or other controlled environments.
+    #[cfg(feature = "https")]
+    pub fn danger_accept_invalid_certs(mut self, accept_invalid_certs: bool) -> Request {
+        self.danger_accept_invalid_certs = accept_invalid_certs;
+        self
+    }
+
+    /// Controls whether invalid TLS hostnames are accepted.
+    ///
+    /// This disables certificate hostname validation and should only be
+    /// used for testing or other controlled environments.
+    #[cfg(feature = "https")]
+    pub fn danger_accept_invalid_hostnames(mut self, accept_invalid_hostnames: bool) -> Request {
+        self.danger_accept_invalid_hostnames = accept_invalid_hostnames;
         self
     }
 
@@ -343,4 +371,19 @@ pub fn get<T: Into<URL>>(url: T) -> Request {
 /// Creates a POST request.
 pub fn post<T: Into<URL>>(url: T) -> Request {
     Request::new(url).with_method("POST")
+}
+
+#[cfg(all(test, feature = "https"))]
+mod tests {
+    use super::Request;
+
+    #[test]
+    fn stores_dangerous_tls_options() {
+        let request = Request::new("https://example.com")
+            .danger_accept_invalid_certs(true)
+            .danger_accept_invalid_hostnames(true);
+
+        assert!(request.danger_accept_invalid_certs);
+        assert!(request.danger_accept_invalid_hostnames);
+    }
 }

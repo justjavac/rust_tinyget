@@ -100,12 +100,10 @@ impl Connection {
         // parse_url in response.rs ensures that there is always a
         // ":port" in the host, which is why this unwrap is safe.
         let dns_name = dns_name.split(':').next().unwrap();
-        /*
         let mut builder = TlsConnector::builder();
-        ...
+        builder.danger_accept_invalid_certs(self.request.danger_accept_invalid_certs);
+        builder.danger_accept_invalid_hostnames(self.request.danger_accept_invalid_hostnames);
         let sess = match builder.build() {
-        */
-        let sess = match TlsConnector::new() {
             Ok(sess) => sess,
             Err(err) => return Err(Error::IoError(io::Error::new(io::ErrorKind::Other, err))),
         };
@@ -137,12 +135,10 @@ impl Connection {
         // parse_url in response.rs ensures that there is always a
         // ":port" in the host, which is why this unwrap is safe.
         let dns_name = dns_name.split(':').next().unwrap();
-        /*
         let mut builder = TlsConnector::builder();
-        ...
+        builder.danger_accept_invalid_certs(self.request.danger_accept_invalid_certs);
+        builder.danger_accept_invalid_hostnames(self.request.danger_accept_invalid_hostnames);
         let sess = match builder.build() {
-        */
-        let sess = match TlsConnector::new() {
             Ok(sess) => sess,
             Err(err) => return Err(Error::IoError(io::Error::new(io::ErrorKind::Other, err))),
         };
