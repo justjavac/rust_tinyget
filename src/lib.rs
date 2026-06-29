@@ -30,6 +30,13 @@
 //! [`Request`](struct.Request.html) and
 //! [`Response`](struct.Response.html) expose
 //!
+//! In controlled test environments, HTTPS requests can opt out of
+//! certificate or hostname validation using
+//! [`danger_accept_invalid_certs`](struct.Request.html#method.danger_accept_invalid_certs)
+//! and
+//! [`danger_accept_invalid_hostnames`](struct.Request.html#method.danger_accept_invalid_hostnames).
+//! These options are dangerous and should not be used in production.
+//!
 //! ## `timeout`
 //!
 //! This feature adds the ability to set a timeout for the request.

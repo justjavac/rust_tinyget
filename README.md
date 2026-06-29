@@ -58,6 +58,18 @@ To enable HTTPS support, add the `https` feature:
 tinyget = { version = "1.1", features = ["https"] }
 ```
 
+For controlled test environments with invalid certificates, HTTPS requests can opt
+out of certificate or hostname validation:
+
+```rust
+let response = tinyget::get("https://self-signed.badssl.com/")
+    .danger_accept_invalid_certs(true)
+    .danger_accept_invalid_hostnames(true)
+    .send()?;
+```
+
+These options are dangerous and should not be used in production.
+
 ### Timeout Support
 
 To enable timeout support, add the `timeout` feature:
