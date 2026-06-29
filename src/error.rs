@@ -15,6 +15,8 @@ pub enum Error {
     /// Couldn't parse the `Content-Length` header's value as an
     /// `usize`.
     MalformedContentLength,
+    /// Couldn't parse the response status line.
+    MalformedStatusLine,
     /// The response was a redirection, but the `Location` header is
     /// missing.
     RedirectLocationMissing,
@@ -48,6 +50,7 @@ impl fmt::Display for Error {
 
             MalformedChunkLength => write!(f, "non-usize chunk length with transfer-encoding: chunked"),
             MalformedContentLength => write!(f, "non-usize content length"),
+            MalformedStatusLine => write!(f, "malformed status line"),
             RedirectLocationMissing => write!(f, "redirection location header missing"),
             InfiniteRedirectionLoop => write!(f, "infinite redirection loop detected"),
             TooManyRedirections => write!(f, "too many redirections (over the max)"),

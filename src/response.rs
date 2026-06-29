@@ -345,7 +345,7 @@ struct ResponseMetadata {
 }
 
 fn read_metadata(stream: &mut HttpStreamBytes) -> Result<ResponseMetadata, Error> {
-    let (status_code, reason_phrase) = parse_status_line(&read_line(stream)?);
+    let (status_code, reason_phrase) = parse_status_line(&read_line(stream)?)?;
 
     let mut headers = HashMap::new();
     loop {
@@ -409,35 +409,24 @@ fn read_line(stream: &mut HttpStreamBytes) -> Result<String, Error> {
     String::from_utf8(bytes).map_err(|_error| Error::InvalidUtf8InResponse)
 }
 
-fn parse_status_line(line: &str) -> (i32, String) {
+fn parse_status_line(line: &str) -> Result<(i32, String), Error> {
     // sample status line format
     // HTTP/1.1 200 OK
-    let mut status_code = String::with_capacity(3);
-    let mut reason_phrase = String::with_capacity(2);
+    let mut parts = line.splitn(3, ' ');
+    let _http_version = parts.next();
+    let status_code = parts.next().ok_or(Error::MalformedStatusLine)?;
+    let reason_phrase = parts.next().unwrap_or("");
 
-    let mut spaces = 0;
+    let status_code = status_code
+        .parse::<i32>()
+        .map_err(|_| Error::MalformedStatusLine)?;
+    let reason_phrase = if reason_phrase.is_empty() {
+        "Server did not provide a reason".to_string()
+    } else {
+        reason_phrase.to_string()
+    };
 
-    for c in line.chars() {
-        if spaces >= 2 {
-            reason_phrase.push(c);
-        }
-
-        if c == ' ' {
-            spaces += 1;
-        } else if spaces == 1 {
-            status_code.push(c);
-        }
-    }
-
-    if let Ok(status_code) = status_code.parse::<i32>() {
-        if !reason_phrase.is_empty() {
-            return (status_code, reason_phrase);
-        } else {
-            return (status_code, "Server did not provide a reason".to_string());
-        }
-    }
-
-    (503, "Server did not provide a status line".to_string())
+    Ok((status_code, reason_phrase))
 }
 
 fn parse_header(mut line: String) -> Option<(String, String)> {
@@ -463,4 +452,34 @@ fn parse_header(mut line: String) -> Option<(String, String)> {
         return Some((line, value));
     }
     None
+}
+
+#[cfg(test)]
+mod tests {
+    use super::parse_status_line;
+    use crate::Error;
+
+    #[test]
+    fn parses_status_line() {
+        let (status_code, reason_phrase) = parse_status_line("HTTP/1.1 200 OK").unwrap();
+
+        assert_eq!(status_code, 200);
+        assert_eq!(reason_phrase, "OK");
+    }
+
+    #[test]
+    fn handles_empty_reason_phrase() {
+        let (status_code, reason_phrase) = parse_status_line("HTTP/1.1 204").unwrap();
+
+        assert_eq!(status_code, 204);
+        assert_eq!(reason_phrase, "Server did not provide a reason");
+    }
+
+    #[test]
+    fn rejects_malformed_status_line() {
+        match parse_status_line("not a status line") {
+            Err(Error::MalformedStatusLine) => {}
+            other => panic!("expected malformed status line, got {:?}", other),
+        }
+    }
 }
