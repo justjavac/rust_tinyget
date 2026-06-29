@@ -25,6 +25,8 @@ pub type URL = String;
 pub struct Request {
     pub(crate) host: URL,
     resource: URL,
+    method: String,
+    body: Vec<u8>,
     headers: HashMap<String, String>,
     query: HashMap<String, String>,
     #[cfg(feature = "timeout")]
@@ -44,6 +46,8 @@ impl Request {
         Request {
             host,
             resource,
+            method: "GET".to_string(),
+            body: Vec::new(),
             headers: HashMap::new(),
             query: HashMap::new(),
             #[cfg(feature = "timeout")]
@@ -58,6 +62,18 @@ impl Request {
     /// function to add headers to your requests.
     pub fn with_header<T: Into<String>, U: Into<String>>(mut self, key: T, value: U) -> Request {
         self.headers.insert(key.into(), value.into());
+        self
+    }
+
+    /// Sets the HTTP method for the request.
+    pub fn with_method<T: Into<String>>(mut self, method: T) -> Request {
+        self.method = method.into();
+        self
+    }
+
+    /// Sets the request body.
+    pub fn with_body<T: AsRef<[u8]>>(mut self, body: T) -> Request {
+        self.body = body.as_ref().to_vec();
         self
     }
 
@@ -215,14 +231,28 @@ impl Request {
             }
             format!("{}{}", self.resource, query_string)
         };
-        http += &format!("GET {} HTTP/1.1\r\nHost: {}\r\n", resource, self.host);
+        http += &format!(
+            "{} {} HTTP/1.1\r\nHost: {}\r\n",
+            self.method, resource, self.host
+        );
         // Add other headers
         for (k, v) in &self.headers {
             http += &format!("{}: {}\r\n", k, v);
         }
 
+        if !self.body.is_empty()
+            && !self
+                .headers
+                .keys()
+                .any(|key| key.eq_ignore_ascii_case("content-length"))
+        {
+            http += &format!("Content-Length: {}\r\n", self.body.len());
+        }
+
         http += "\r\n";
-        http.into_bytes()
+        let mut http = http.into_bytes();
+        http.extend_from_slice(&self.body);
+        http
     }
 
     /// Returns the redirected version of this Request, unless an
@@ -308,4 +338,9 @@ fn parse_url(url: URL) -> (bool, URL, URL) {
 /// Alias for [Request::new](struct.Request.html#method.new)
 pub fn get<T: Into<URL>>(url: T) -> Request {
     Request::new(url)
+}
+
+/// Creates a POST request.
+pub fn post<T: Into<URL>>(url: T) -> Request {
+    Request::new(url).with_method("POST")
 }
