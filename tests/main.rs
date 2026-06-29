@@ -1,7 +1,7 @@
 extern crate tinyget;
-mod setup;
+mod common;
 
-use self::setup::*;
+use self::common::*;
 
 #[test]
 // Test based on issue #23: https://github.com/neonmoe/minreq/issues/23
@@ -22,6 +22,7 @@ fn test_dns_name_error() {
 
 #[test]
 #[cfg(feature = "https")]
+#[ignore = "depends on external network availability"]
 fn test_https() {
     // TODO: Implement this locally.
     assert_eq!(

@@ -1,7 +1,7 @@
 extern crate tinyget;
-mod setup;
+mod common;
 
-use self::setup::*;
+use self::common::*;
 
 #[test]
 fn test_basic_functionality() -> Result<(), Box<dyn std::error::Error>> {
@@ -20,7 +20,8 @@ fn test_basic_functionality() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn test_basic_query() -> Result<(), Box<dyn std::error::Error>> {
-    let response = tinyget::get("http://httpbin.org/get")
+    setup();
+    let response = tinyget::get(url("/query"))
         .with_query("name", "Tiny")
         .send()?;
 
@@ -32,7 +33,8 @@ fn test_basic_query() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn test_multiple_queries() -> Result<(), Box<dyn std::error::Error>> {
-    let response = tinyget::get("http://httpbin.org/get")
+    setup();
+    let response = tinyget::get(url("/query"))
         .with_query("name", "Tiny")
         .with_query("age", "30")
         .send()?;
@@ -46,7 +48,8 @@ fn test_multiple_queries() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn test_special_characters() -> Result<(), Box<dyn std::error::Error>> {
-    let response = tinyget::get("http://httpbin.org/get")
+    setup();
+    let response = tinyget::get(url("/query"))
         .with_query("message", "Hello World!")
         .with_query("user", "Tiny")
         .send()?;
@@ -60,19 +63,21 @@ fn test_special_characters() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn test_chinese_characters() -> Result<(), Box<dyn std::error::Error>> {
-    let response = tinyget::get("http://httpbin.org/get")
+    setup();
+    let response = tinyget::get(url("/query"))
         .with_query("name", "张三")
         .send()?;
 
     let body = get_body(Ok(response));
 
-    assert!(body.contains("\"name\": \"\\u5f20\\u4e09\""));
+    assert!(body.contains("\"name\": \"张三\""));
     Ok(())
 }
 
 #[test]
 fn test_existing_query_parameters() -> Result<(), Box<dyn std::error::Error>> {
-    let response = tinyget::get("http://httpbin.org/get?existing=param")
+    setup();
+    let response = tinyget::get(url("/query?existing=param"))
         .with_query("name", "Tiny")
         .with_query("age", "25")
         .send()?;
