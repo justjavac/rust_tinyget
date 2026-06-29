@@ -79,6 +79,13 @@ fn test_get() {
 }
 
 #[test]
+fn test_post() {
+    setup();
+    let body = get_body(tinyget::post(url("/post")).with_body("hello").send());
+    assert_eq!(body, "method: POST\nbody: hello");
+}
+
+#[test]
 fn test_redirect_get() {
     setup();
     let body = get_body(tinyget::get(url("/redirect")).send());

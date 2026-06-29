@@ -15,7 +15,7 @@ pub fn setup() {
             let server = server.clone();
 
             thread::spawn(move || loop {
-                let request = {
+                let mut request = {
                     if let Ok(request) = server.recv() {
                         request
                     } else {
@@ -41,6 +41,14 @@ pub fn setup() {
 
                     Method::Get if url.starts_with("/query") => {
                         let response = Response::from_string(echo_query_params(&url));
+                        request.respond(response).ok();
+                    }
+
+                    Method::Post if url == "/post" => {
+                        let mut body = String::new();
+                        request.as_reader().read_to_string(&mut body).ok();
+                        let response =
+                            Response::from_string(format!("method: POST\nbody: {}", body));
                         request.respond(response).ok();
                     }
 
