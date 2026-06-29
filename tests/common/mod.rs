@@ -39,6 +39,11 @@ pub fn setup() {
                         request.respond(Response::from_string("No header!")).ok();
                     }
 
+                    Method::Get if url.starts_with("/query") => {
+                        let response = Response::from_string(echo_query_params(&url));
+                        request.respond(response).ok();
+                    }
+
                     Method::Get if url == "/slow_a" => {
                         thread::sleep(Duration::from_secs(2));
                         let response = Response::from_string(format!("j: {}", content));
@@ -136,4 +141,32 @@ pub fn get_status_code(request: Result<tinyget::Response, tinyget::Error>) -> i3
             -1
         }
     }
+}
+
+fn echo_query_params(url: &str) -> String {
+    let query = url.split_once('?').map(|(_, query)| query).unwrap_or("");
+    let mut body = String::new();
+
+    for pair in query.split('&').filter(|pair| !pair.is_empty()) {
+        let (key, value) = pair.split_once('=').unwrap_or((pair, ""));
+        let key = decode_query_component(key);
+        let value = decode_query_component(value);
+        body.push_str(&format!(
+            "\"{}\": \"{}\"\n",
+            escape_json(&key),
+            escape_json(&value)
+        ));
+    }
+
+    body
+}
+
+fn decode_query_component(value: &str) -> String {
+    urlencoding::decode(value)
+        .map(|value| value.into_owned())
+        .unwrap_or_else(|_| value.to_string())
+}
+
+fn escape_json(value: &str) -> String {
+    value.replace('\\', "\\\\").replace('"', "\\\"")
 }
